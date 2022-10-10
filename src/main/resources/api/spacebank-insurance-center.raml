@@ -1,0 +1,188 @@
+#%RAML 1.0
+title: SpaceBank Insurance Center
+
+mediaType: 
+- application/json
+
+
+types:
+  AccountInfo: !include types/AccountInfo.raml
+  LoginRequest: !include types/LoginRequest.raml
+  LoginResponse: !include types/LoginResponse.raml
+  CustomError: !include types/CustomError.raml
+  PolicyListing: !include types/PolicyListing.raml
+  ClaimRequest: !include types/ClaimRequest.raml
+  SettlePaymentRequest: !include types/SettlePaymentRequest.raml
+
+
+/account:
+  displayName: Manage Account
+
+  post:
+    displayName: Create User Account
+    description: User account represents a single user
+    body:
+      type: AccountInfo
+    responses:
+      201:
+        body:
+      400:
+        body:
+          type: CustomError  
+  get:
+    displayName: Get User Account
+    description: User account represents a single user
+    headers:
+      authToken:
+        type: string
+        required: true
+
+    responses:
+      201:
+        body:
+      404:
+        body:
+          type: CustomError  
+
+  /login:
+    post:
+      displayName: Login to Account
+      body:
+        type: LoginRequest
+      responses:
+        200:
+          body:
+            type: LoginResponse
+        401:
+          body:
+            type: CustomError  
+
+  /policies:
+    displayName: Manage Policies
+    get:
+      displayName: Get List of Policies under your account
+      headers:
+        authToken:
+          type: string
+          required: true
+      queryParameters:
+        policyType:
+            type: string
+            required: false
+      responses:
+        200:
+          body:
+            type: PolicyListing[]
+    
+    /create-policy:
+      /retirement:
+        displayName: Create Retirement Insurance Policy
+        post:
+          displayName: create retirement insurance policy
+          headers:
+            authToken:
+              type: string
+              required: true
+          body:
+            multipart/form-data:
+              properties:
+                govtId:
+                  description: Government Issued Id
+                  type: file
+                  required: true
+                policyInfo:
+                  description: Government Issued Id
+                  type: object
+                  required: true
+      /car:
+        displayName: Create Car Insurance Policy
+        post:
+          displayName: create car insurance policy
+          headers:
+            authToken:
+              type: string
+              required: true
+          body:
+            type: object
+      /hmo:
+        displayName: Create HMO Policy
+        post:
+          displayName: create retirement insurance policy
+          headers:
+            authToken:
+              type: string
+              required: true
+          body:
+            multipart/form-data:
+              properties:
+                govtId:
+                  description: Government Issued Id
+                  type: file
+                  required: true
+                policyInfo:
+                  description: Government Issued Id
+                  type: object
+                  required: true
+
+    /{policynumber}:
+      displayName: Manage Policy
+      get:
+        displayName: View Policy
+        headers:
+          authToken:
+            type: string
+            required: true
+    /settle-payment:
+      displayName: Make Payments from bank account number
+      post:
+        displayName: Make Payments from bank account number to policy
+        headers:
+          authToken:
+            type: string
+            required: true
+        body:
+          type: SettlePaymentRequest
+        responses:
+          200:
+            body:
+              type: object
+
+
+    /claim:
+      displayName: Claim Policy
+      post:
+        headers:
+          authToken:
+            type: string
+            required: true
+        body:
+          multipart/form-data:
+            properties:
+              proof1:
+                description: Proof Image 1
+                type: file
+                required: true
+              proof2:
+                description: Proof Image 2
+                type: file
+                required: false
+              claimInfo:
+                description: Claim information
+                type: 
+                required: true
+/offers:
+  /cars:
+    get:
+      responses:
+        200:
+
+  /hmo:
+    get:
+      responses:
+        200:
+  
+  /retirement:
+    get:
+      responses:
+        200:
+
